@@ -6,7 +6,7 @@ const DashBoardPage = async () => {
     const {getUser} = getKindeServerSession();
     const user = await getUser();
     if(!user || !user.id){
-        return redirect("/auth-callback?origin=dashboard")
+         redirect("/auth-callback?origin=dashboard")
     }
 
     return(
