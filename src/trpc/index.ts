@@ -43,6 +43,7 @@ export const appRouter = router({
       },
     });
   }),
+
   deleteUserFile: privateProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
