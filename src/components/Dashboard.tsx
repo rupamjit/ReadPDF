@@ -17,7 +17,7 @@ const Dashboard = () => {
 
   const { data: files, isLoading } = trpc.getUserFiles.useQuery();
 
-  const { mutate: deleteUserFile, isLoading } = trpc.deleteUserFile.useMutation(
+  const { mutate: deleteUserFile } = trpc.deleteUserFile.useMutation(
     {
       onSuccess: () => {
         utils.getUserFiles.invalidate();
