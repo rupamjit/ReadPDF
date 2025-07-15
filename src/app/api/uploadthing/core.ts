@@ -26,7 +26,8 @@ export const ourFileRouter = {
           key: file.key,
           name: file.name,
           userId: metadata.userID,
-          url: `https://uploadthing-grod-prod.s3.us-west-2.amazonaws.com/${file.key}`,
+          // url: `https://uploadthing-grod-prod.s3.us-west-2.amazonaws.com/${file.key}`,
+          url: file.url,
           uploadStatus: "PROCESSING",
         },
       });
