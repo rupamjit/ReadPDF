@@ -1,5 +1,11 @@
 "use client";
-import { ChevronDown, ChevronUp, Loader2, RotateCw, Search } from "lucide-react";
+import {
+  ChevronDown,
+  ChevronUp,
+  Loader2,
+  RotateCw,
+  Search,
+} from "lucide-react";
 import { Document, Page, pdfjs } from "react-pdf";
 import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
@@ -19,10 +25,11 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import SimpleBar from "simplebar-react";
+import PdfFullScreen from "./PdfFullScreen";
 
 pdfjs.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjs.version}/build/pdf.worker.min.mjs`;
 
-interface PdfRendererProps {
+export interface PdfRendererProps {
   url: string;
 }
 
@@ -30,7 +37,7 @@ const PdfRenderer = ({ url }: PdfRendererProps) => {
   const [numPages, setNumPages] = useState<number>();
   const [currentPage, setCurrentPage] = useState<number>(1);
   const [scale, setScale] = useState<number>(1);
-  const [rotation,setRotation] = useState<number>(0)
+  const [rotation, setRotation] = useState<number>(0);
 
   const { width, ref } = useResizeDetector();
 
@@ -67,6 +74,7 @@ const PdfRenderer = ({ url }: PdfRendererProps) => {
             disabled={currentPage <= 1}
             onClick={() => {
               setCurrentPage((prev) => (prev - 1 > 1 ? prev - 1 : 1));
+              setValue("page", String(currentPage - 1));
             }}
             variant="ghost"
             aria-label="previous page"
@@ -98,6 +106,7 @@ const PdfRenderer = ({ url }: PdfRendererProps) => {
               setCurrentPage((prev) =>
                 prev + 1 > numPages ? numPages : prev + 1
               );
+              setValue("page", String(currentPage + 1));
             }}
             variant="ghost"
             aria-label="previous page"
@@ -130,39 +139,44 @@ const PdfRenderer = ({ url }: PdfRendererProps) => {
             </DropdownMenuContent>
           </DropdownMenu>
 
-          <Button onClick={()=>setRotation(prev=>prev+90)} variant="ghost" aria-label="rotate 90 degrees">
-            <RotateCw className="h-4 w-4"/>
+          <Button
+            onClick={() => setRotation((prev) => prev + 90)}
+            variant="ghost"
+            aria-label="rotate 90 degrees"
+          >
+            <RotateCw className="h-4 w-4" />
           </Button>
-
+          
         </div>
+        <PdfFullScreen fileUrl={url} />
       </div>
 
       <div className="flex-1 w-full max-h-screen">
         <SimpleBar autoHide={false} className="max-h-[calc(100vh-10rem)]">
-        <div ref={ref}>
-          <Document
-            loading={
-              <div className="flex justify-center">
-                <Loader2 className="my-24 h-6 animate-spin" />
-              </div>
-            }
-            onLoadError={() => {
-              toast("Error in loading Pdf. Please try again later.");
-            }}
-            onLoadSuccess={({ numPages }) => {
-              setNumPages(numPages);
-            }}
-            file={url}
-            className="max-h-full"
-          >
-            <Page
-            rotate={rotation}
-              scale={scale}
-              width={width ? width : 1}
-              pageNumber={currentPage}
-            />
-          </Document>
-        </div>
+          <div ref={ref}>
+            <Document
+              loading={
+                <div className="flex justify-center">
+                  <Loader2 className="my-24 h-6 animate-spin" />
+                </div>
+              }
+              onLoadError={() => {
+                toast("Error in loading Pdf. Please try again later.");
+              }}
+              onLoadSuccess={({ numPages }) => {
+                setNumPages(numPages);
+              }}
+              file={url}
+              className="max-h-full"
+            >
+              <Page
+                rotate={rotation}
+                scale={scale}
+                width={width ? width : 1}
+                pageNumber={currentPage}
+              />
+            </Document>
+          </div>
         </SimpleBar>
       </div>
     </div>
