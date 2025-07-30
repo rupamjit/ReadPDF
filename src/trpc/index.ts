@@ -1,4 +1,4 @@
-import { INFINIT_QUERY_LIMIT } from "./../config/infinite-query";
+import { INFINITE_QUERY_LIMIT } from "./../config/infinite-query";
 import { getKindeServerSession } from "@kinde-oss/kinde-auth-nextjs/server";
 import { privateProcedure, publicProcedure, router } from "./trpc";
 import { TRPCError } from "@trpc/server";
@@ -90,7 +90,7 @@ export const appRouter = router({
     .query(async ({ ctx, input }) => {
       const { userId } = ctx;
       const { fileId, cursor } = input;
-      const limit = input.limit ?? INFINIT_QUERY_LIMIT!;
+      const limit = input.limit ?? INFINITE_QUERY_LIMIT!;
       const file = await db.file.findFirst({
         where: {
           userId,
