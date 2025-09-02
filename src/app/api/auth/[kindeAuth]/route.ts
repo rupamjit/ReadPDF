@@ -1,10 +1,10 @@
-// @ts-nocheck
-import { handleAuth } from '@kinde-oss/kinde-auth-nextjs/server';
+import { handleAuth } from '@kinde-oss/kinde-auth-nextjs/server'
+import { NextRequest } from 'next/server'
 
 export async function GET(
-  request: Request,
+  request: NextRequest,
   { params }: any
 ) {
-  const result =  handleAuth(request, params.kindeAuth);
-  return result;
+  const endpoint = params.kindeAuth
+  return handleAuth(request, endpoint)
 }
