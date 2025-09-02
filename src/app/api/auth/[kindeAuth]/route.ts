@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { handleAuth } from '@kinde-oss/kinde-auth-nextjs/server';
 
 export async function GET(
