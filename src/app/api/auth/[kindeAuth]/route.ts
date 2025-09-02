@@ -1,13 +1,9 @@
-import { handleAuth } from '@kinde-oss/kinde-auth-nextjs/server'
-import { NextRequest } from 'next/server'
-
-
-
+import { handleAuth } from '@kinde-oss/kinde-auth-nextjs/server';
 
 export async function GET(
-  request: NextRequest,
-  { params }:any
+  request: Request,
+  { params }: any
 ) {
-  const endpoint = params.kindeAuth
-  return handleAuth(request, endpoint)
+  const result =  handleAuth(request, params.kindeAuth);
+  return result;
 }
