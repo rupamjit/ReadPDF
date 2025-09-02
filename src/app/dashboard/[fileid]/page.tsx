@@ -7,13 +7,13 @@ import PDFRenderer from "@/components/PdfRenderer";
 import { getUserSubscriptionPlan } from "@/lib/stripe";
 
 interface PageProps {
-  params: {
+  params: Promise<{
     fileid: string;
-  };
+  }>;
 }
 
 const Page = async ({ params }: PageProps) => {
-  const { fileid } = params;
+  const { fileid } = await params;
 
   const { getUser } = getKindeServerSession();
   const user = await getUser();
