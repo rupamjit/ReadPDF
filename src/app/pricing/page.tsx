@@ -216,7 +216,7 @@ const Page = async() => {
                       {plan === 'Free' ? (
                         <Link
                           href={
-                            user ? '/dashboard' : '/sign-in'
+                            user ? '/dashboard' : '/api/auth/login'
                           }
                           className={buttonVariants({
                             className: 'w-full',
@@ -229,7 +229,7 @@ const Page = async() => {
                         <UpgradeButton />
                       ) : (
                         <Link
-                          href='/sign-in'
+                          href='/api/auth/login'
                           className={buttonVariants({
                             className: 'w-full',
                           })}>
