@@ -10,13 +10,17 @@ import { toast } from "sonner";
 import { trpc } from "@/app/_trpc/client";
 import { useRouter } from "next/navigation";
 
-const UploadDropZone = () => {
+const UploadDropZone = ({
+  isSubscribed,
+}: {
+  isSubscribed: boolean
+}) => {
 
   const router = useRouter()
   const [isUploading, setIsUploading] = useState<boolean>(false);
   const [uploadProgress, setUploadProgress] = useState<number>(0);
 
-  const { startUpload } = useUploadThing("pdfUploader");
+  const { startUpload } = useUploadThing(isSubscribed ? 'proPlanUploader' : 'freePlanUploader');
   const {mutate:startPolling} = trpc.getFile.useMutation({
     onSuccess:(file)=>{
       router.push(`/dashboard/${file.id}`)
@@ -126,7 +130,11 @@ const UploadDropZone = () => {
   );
 };
 
-const UploadButton = () => {
+const UploadButton = ({
+  isSubscribed,
+}: {
+  isSubscribed: boolean
+}) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
   return (
     <Dialog
@@ -142,7 +150,7 @@ const UploadButton = () => {
       </DialogTrigger>
 
       <DialogContent>
-        <UploadDropZone />
+        <UploadDropZone isSubscribed={isSubscribed} />
       </DialogContent>
     </Dialog>
   );

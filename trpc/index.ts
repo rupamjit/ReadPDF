@@ -4,6 +4,9 @@ import { TRPCError } from "@trpc/server";
 import { db } from "../db";
 import z from "zod";
 import { INFINITE_QUERY_LIMIT } from "@/components/chat/ChatContext";
+import { absoluteUrl } from "@/lib/utils";
+import { getUserSubscriptionPlan, stripe } from "@/lib/stripe";
+import { PLANS } from "../config/stripe";
 export const appRouter = router({
   authCallback: publicProcedure.query(async () => {
     const { getUser } = getKindeServerSession();
@@ -141,5 +144,112 @@ export const appRouter = router({
 
       return file;
     }),
+  // createStripeSession: privateProcedure.mutation(async ({ ctx }) => {
+  //   const { userId } = ctx;
+  //   const billingUrl = absoluteUrl("/dashboard/billing");
+
+  //   if (!userId) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+  //   const dbUser = await db.user.findUnique({
+  //     where: {
+  //       id: userId,
+  //     },
+  //   });
+
+  //   if (!dbUser) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+  //   const subscriptionPlan = await getUserSubscriptionPlan();
+
+  //   if (subscriptionPlan.isSubscribed && dbUser.stripeCustomerId) {
+  //     const stripeSession = await stripe.billingPortal.sessions.create({
+  //       customer: dbUser.stripeCustomerId,
+  //       return_url: billingUrl,
+  //     });
+
+  //     return { url: stripeSession.url };
+  //   }
+
+  //   const stripeSession = await stripe.checkout.sessions.create({
+  //     success_url: billingUrl,
+  //     cancel_url: billingUrl,
+  //     payment_method_types: ["card"],
+  //     mode: "subscription",
+  //     customer_email: dbUser.email,
+  //     billing_address_collection: "required",
+  //     line_items: [
+  //       {
+  //         price: PLANS.find((plan) => plan.name === "Pro")?.price.priceIds.test,
+  //         quantity: 1,
+  //       },
+  //     ],
+  //     metadata: {
+  //       userId,
+  //     },
+  //   });
+
+  //   return { url: stripeSession.url };
+  // }),
+  createStripeSession: privateProcedure.mutation(async ({ ctx }) => {
+  const { userId } = ctx;
+  const billingUrl = absoluteUrl("/dashboard/billing");
+
+  if (!userId) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+  const dbUser = await db.user.findUnique({
+    where: {
+      id: userId,
+    },
+  });
+
+  if (!dbUser) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+  const subscriptionPlan = await getUserSubscriptionPlan();
+
+  if (subscriptionPlan.isSubscribed && dbUser.stripeCustomerId) {
+    const stripeSession = await stripe.billingPortal.sessions.create({
+      customer: dbUser.stripeCustomerId,
+      return_url: billingUrl,
+    });
+
+    return { url: stripeSession.url };
+  }
+
+  // Get the Pro plan and correct price ID
+  const proPlan = PLANS.find((plan) => plan.name === "Pro");
+  
+  // Use 'production' instead of 'prod' to match your PLANS structure
+  const priceId = process.env.NODE_ENV === 'production' 
+    ? proPlan?.price?.priceIds?.production 
+    : proPlan?.price?.priceIds?.test;
+
+  if (!priceId) {
+    throw new TRPCError({ 
+      code: "INTERNAL_SERVER_ERROR", 
+      message: `Price ID not found for Pro plan in ${process.env.NODE_ENV} environment` 
+    });
+  }
+
+  console.log('Using price ID:', priceId); // Debug log
+
+  const stripeSession = await stripe.checkout.sessions.create({
+    success_url: billingUrl,
+    cancel_url: billingUrl,
+    payment_method_types: ["card"],
+    mode: "subscription",
+    customer_email: dbUser.email,
+    billing_address_collection: "auto",
+    line_items: [
+      {
+        price: priceId, // This should now be your actual Stripe price ID
+        quantity: 1,
+      },
+    ],
+    metadata: {
+      userId,
+    },
+  });
+
+  return { url: stripeSession.url };
+})
 });
 export type AppRouter = typeof appRouter;
