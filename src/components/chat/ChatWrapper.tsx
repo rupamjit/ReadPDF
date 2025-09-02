@@ -19,7 +19,7 @@ const ChatWrapper = ({ fileId, isSubscribed }: ChatWrapperProps) => {
     { fileId },
     {
       refetchInterval: (data) =>
-        // @ts-expect-error
+
         data?.status === "SUCCESS" || data?.status === "FAILED" ? false : 500,
     }
   );
