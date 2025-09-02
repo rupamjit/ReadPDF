@@ -8,6 +8,7 @@ import {
 import { ArrowRight } from 'lucide-react'
 import MobileNav from './MobileNav'
 import MaxWidthWrapper from './ MaxWidthWrapper'
+import UserAccountNav from './UserAccountNav'
 
 
 
@@ -65,7 +66,15 @@ const Navbar = async () => {
                   Dashboard
                 </Link>
 
-                
+                <UserAccountNav
+                  name={
+                    !user.given_name || !user.family_name
+                      ? 'Your Account'
+                      : `${user.given_name} ${user.family_name}`
+                  }
+                  email={user.email ?? ''}
+                  imageUrl={user.picture ?? ''}
+                />
               </>
             )}
           </div>
